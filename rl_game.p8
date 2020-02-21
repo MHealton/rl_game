@@ -2,12 +2,16 @@ pico-8 cartridge // http://www.pico-8.com
 version 18
 __lua__
 function _init()
+	t=0
+	p_ani={240,241,242,243}
+	
 	_upd=update_game
 	_drw=draw_game
 	startgame()
 end
 
 function _update()
+	t+=1
  _upd()
 end
 
@@ -18,23 +22,50 @@ end
 function startgame()
 	p_x=4
 	p_y=5
+	p_ox=0
+	p_oy=0
 end
 -->8
 --updates
 function update_game()
 	if btnp(⬅️) then
 		p_x-=1
+		p_ox=8
+		_upd=update_pturn
 	end
 	if btnp(➡️) then
 		p_x+=1
+		p_ox=-8
+		_upd=update_pturn
 	end
 	if btnp(⬆️) then
 		p_y-=1
+		p_oy=8
+		_upd=update_pturn
 	end
 	if btnp(⬇️) then
 		p_y+=1
+		p_oy=-8
+		_upd=update_pturn
 	end
+end
 
+function update_pturn()
+ if p_ox>0 then
+  p_ox-=1
+ end
+ if p_ox<0 then
+  p_ox+=1
+ end
+ if p_oy>0 then
+  p_oy-=1
+ end
+ if p_oy<0 then
+  p_oy+=1
+ end
+ if p_ox==0 and p_oy==0 then
+  _upd=update_game
+ end
 end
 
 function update_gameover()
@@ -46,12 +77,23 @@ function draw_game()
 	cls()
 	map()
 	
-	palt(0,false)
-	spr(240,p_x*8,p_y*8)
+	drawspr(getframe(p_ani),p_x*8+p_ox,p_y*8+p_oy,10)
 end
 
 function draw_gameover()
 
+end
+-->8
+--tools
+function getframe(ani)	
+	return ani[flr(t/8)%#ani+1]
+end
+
+function drawspr(_spr,_x,_y,_c)
+	palt(0,false)
+	pal(6,_c)
+	spr(_spr,_x,_y)
+	pal()
 end
 __gfx__
 00000000000000006666066000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009055555555
